@@ -42,7 +42,7 @@ public class FileServiceImpl implements FileService {
 		@Override
 	public Node next() throws ServiceException{			
 		 int currentSymbolCode;		 				 
-		 StringBuilder nodeContent = new StringBuilder(); // для формирвоания узлов содержащих контент					
+		 StringBuilder characters = new StringBuilder(); // для формирвоания узлов содержащих контент					
 								 
 		 try {			 
 			while((currentSymbolCode = reader.read()) != -1){							
@@ -50,37 +50,38 @@ public class FileServiceImpl implements FileService {
 										 
 				if(currentSymbol == '<'){	
 					
-						if(nodeContent.length() != 0){
+					if(characters.length() != 0){
+						
+						if(isStringContrinsOnlySpaces(characters)){
 							
-							if(isStringContrinsOnlySpaces(nodeContent)){
-								
-								nodeContent.setLength(0);										
-								reader.reset();										
-								continue;	
-								
-							} else{								
-								Node node = new Node();
-								node.setNodeContent(nodeContent.toString());
-								node.setNodeType(NodeType.CONTENT);
-								
-								nodeContent.setLength(0);																	
-								reader.reset();
-								
-								return node;
-							}																			
-						}				
-					String currentNode = getCurrentNodeContent(reader);
-												
-					Node node = makeNodeFromString(currentNode);
+							characters.setLength(0);										
+							reader.reset();										
+							continue;	
+							
+						} else{								
+							Node node = new Node();
+							node.setNodeContent(characters.toString());
+							node.setNodeType(NodeType.CONTENT);
+							
+							characters.setLength(0);																	
+							reader.reset();
+							
+							return node;
+						}																			
+					}
 					
-					return node;
+				String currentNode = getCurrentNodeContent(reader);
+											
+				Node node = makeNodeFromString(currentNode);
+				
+				return node;
 				}
 				
 				if(currentSymbol != '\t' && //отсекаем не нужные символы
 				   currentSymbol != '\n' &&
 				   currentSymbol != '\r'){	
 					
-					nodeContent.append(currentSymbol);
+					characters.append(currentSymbol);
 					reader.mark(0);												
 					continue;
 				}						
@@ -111,24 +112,22 @@ public class FileServiceImpl implements FileService {
 		}
 	}
 	
-	 private  String getCurrentNodeContent(BufferedReader reader) throws ServiceException{
+	 private  String getCurrentNodeContent(BufferedReader reader) 
+			 									throws ServiceException{
 		 
 		 StringBuilder nodeContent = new StringBuilder();
-		 int c;
-		 
+		 int c;		 
 			 try{
-				  while( (char)(c = reader.read()) != '>'){
+				  while((char)(c = reader.read()) != '>'){
 					  	nodeContent.append((char)c);
-				  	}		
-			 }   catch(IOException e){
-				 
+				  }		
+			 }   catch(IOException e){				 
 				 	throw new ServiceException("ошибка чтения узла",e);
 			 }			 
 		 return new String(nodeContent);
 	 }
 	 
-	 private boolean isStringContrinsOnlySpaces(StringBuilder string){
-		 
+	 private boolean isStringContrinsOnlySpaces(StringBuilder string){		 
 		 int spaceCounter = 0;
 		 
 		 for(int i = 0;i< string.length();i++){

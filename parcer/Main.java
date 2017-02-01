@@ -9,8 +9,7 @@ public class Main {
 
 	public static void main(String[] args)  {
 	
-		ServiceFactory serviceFactoryObject = ServiceFactory.getInstance();
-		
+		ServiceFactory serviceFactoryObject = ServiceFactory.getInstance();		
 		FileService fileService = serviceFactoryObject.getFileService();
 	
 		Node node;
@@ -23,7 +22,7 @@ public class Main {
 				System.out.println(node.getNodeType()+" "+
 								   node.getNodeContent());	
 				
-				}
+			}
 		} catch(ServiceException e){
 			System.out.println("при попытке анализа документа произошла ошибка:"+
 																e.getMessage());
